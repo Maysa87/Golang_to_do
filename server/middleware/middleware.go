@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Maysa87/Goland_to_do/models"
+	"github.com/Maysa87/Golang_to_do.git/server/models"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
@@ -74,7 +74,7 @@ func TaskComplete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "PUT")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-type")
 	params := mux.Vars(r)
-	// TaskComplete(params["id"])
+	taskComplete(params["id"])
 	json.NewEncoder(w).Encode(params["id"])
 }
 
@@ -84,7 +84,7 @@ func UndoTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "PUT")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-type")
 	params := mux.Vars(r)
-	// UndoTask(params["id"])
+	undoTask(params["id"])
 	json.NewEncoder(w).Encode(params["id"])
 }
 

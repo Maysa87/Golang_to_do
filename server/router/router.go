@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/Maysa87/Goland_to_do/middleware"
+	"github.com/Maysa87/Golang_to_do.git/server/middleware"
 	"github.com/gorilla/mux"
 )
 
