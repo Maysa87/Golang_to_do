@@ -1,2 +1,2 @@
 # Golang_to_do
-Golang to do app using react
+A fullstack to-do application using Golang and React
