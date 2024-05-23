@@ -17,7 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var collection *mongo.collention
+var collection *mongo.Collection
 
 func init() {
 	loadTheEnv()
@@ -35,7 +35,7 @@ func createDBInstance() {
 	dbName := os.Getenv("DB_NAME")
 	collectionName := os.Getenv("DB_COLLECTION_NAME")
 
-	clientOptions := options.Client().ApllyURI(connectionString)
+	clientOptions := options.Client().ApplyURI(connectionString)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 
 	if err != nil {
@@ -46,7 +46,7 @@ func createDBInstance() {
 		log.Fatal(err)
 	}
 	fmt.Println("connected to MongoDB!")
-	client.Database(dbName).collection(collectionName)
+	client.Database(dbName).Collection(collectionName)
 	fmt.Println("collection instance created")
 }
 
@@ -74,7 +74,7 @@ func TaskComplete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "PUT")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-type")
 	params := mux.Vars(r)
-	TaskComplete(params["id"])
+	// TaskComplete(params["id"])
 	json.NewEncoder(w).Encode(params["id"])
 }
 
@@ -84,7 +84,7 @@ func UndoTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "PUT")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-type")
 	params := mux.Vars(r)
-	UndoTask(params["id"])
+	// UndoTask(params["id"])
 	json.NewEncoder(w).Encode(params["id"])
 }
 
@@ -118,7 +118,7 @@ func getAllTask() []primitive.M {
 		}
 		results = append(results, result)
 	}
-	if err := cursor.err(); err != nil {
+	if err := cursor.Err(); err != nil {
 		log.Fatal(err)
 	}
 	cursor.Close(context.Background())
@@ -126,7 +126,7 @@ func getAllTask() []primitive.M {
 }
 
 func taskComplete(Task string) {
-	id, _ := primitive.ObjectIDFromHeaders
+	id, _ := primitive.ObjectIDFromHex(Task)
 	filter := bson.M{"_id": id}
 	update := bson.M{"$set": bson.M{"status": true}}
 	result, err := collection.UpdateOne(context.Background(), update, filter)
@@ -137,15 +137,15 @@ func taskComplete(Task string) {
 }
 
 func insertOneTask(Task models.ToDo) {
-	insertResult, err := collection.InsertOne(context.Background(), task)
+	insertResult, err := collection.InsertOne(context.Background(), Task)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("Inserted a single record", insertResult.InsertedID)
 }
 
-func undoTask(Task String) {
-	id, _ := primitive.objectIDFromHex(task)
+func undoTask(Task string) {
+	id, _ := primitive.ObjectIDFromHex(Task)
 	filter := bson.M{"_id": id}
 	update := bson.M{"$set": bson.M{"status": false}}
 	result, err := collection.UpdateOne(context.Background(), update, filter)
@@ -155,21 +155,21 @@ func undoTask(Task String) {
 	fmt.Println("Modified count:", result.ModifiedCount)
 }
 
-func deleteOneTask(Task String) {
-	id, _ := primitive.objectIDFromHex(task)
+func deleteOneTask(Task string) {
+	id, _ := primitive.ObjectIDFromHex(Task)
 	filter := bson.M{"_id": id}
-	d, err := collection.DeleteOne(context.Background(), filter)
+	result, err := collection.DeleteOne(context.Background(), filter)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Deleted document:", result.DeleteCount)
+	fmt.Println("Deleted document:", result.DeletedCount)
 }
 
 func deleteAllTask() int64 {
-	d, err := collection.DeleteMany(context.Background(), "", nil)
+	result, err := collection.DeleteMany(context.Background(), "", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Deleted document:", result.DeleteCount)
-	return d.DeleteCount
+	fmt.Println("Deleted document:", result.DeletedCount)
+	return result.DeletedCount
 }
